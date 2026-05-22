@@ -61,7 +61,7 @@ Still searching for enough interview participants. Need at least three solid int
 
 ## Day 3 — 2026-05-22
 
-**Hours worked:** X
+**Hours worked:** ~4 (still working)
 
 ### What I did:
 Scaffolded the project using:
