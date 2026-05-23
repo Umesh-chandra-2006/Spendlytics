@@ -61,7 +61,7 @@ Still searching for enough interview participants. Need at least three solid int
 
 ## Day 3 — 2026-05-22
 
-**Hours worked:** ~4 (still working)
+**Hours worked:** 3
 
 ### What I did:
 Scaffolded the project using:
@@ -99,3 +99,24 @@ Trying to design audit logic that is financially reasonable and explainable inst
 - Complete the audit logic for all supported tools
 - Build the audit results page
 - Display recommendation reasoning and savings breakdown clearly
+
+## Day 4 — 2026-05-23
+
+**Hours worked:** 4
+
+**What I did:**
+Completed the migration of the frontend into a pure React + Vite SPA, moving away from Next.js to simplify deployment and ensure deterministic execution. Built a lightweight backend using Express to securely proxy API calls to OpenRouter (`openrouter/owl-alpha`) to generate the personalized executive summary. Ensured all TypeScript errors were resolved and the `auditEngine.ts` pricing math was completely accurate.
+Conducted three user interviews to gather real-world data on how teams view and manage their AI spend. Set up the GitHub Actions CI workflow to run lint and testing automatically. Drafted `ARCHITECTURE.md`, `PRICING_DATA.md`, and `PROMPTS.md`.
+
+**What I learned:**
+Talking directly to users in the interviews revealed surprising assumptions about how they value AI subscriptions compared to actual usage. Also, separating the stack into Vite + Express makes local development extremely fast, though it required configuring CORS and running a separate Node process for the API.
+
+**Blockers / what I'm stuck on:**
+Need to build out the automated tests for the audit engine to satisfy the rubric's requirements.
+
+**Plan for tomorrow:**
+- Write the automated tests (using Vitest)
+- Finalize the remaining entrepreneurial files
+- Prepare for final deployment and submission check
+
+---

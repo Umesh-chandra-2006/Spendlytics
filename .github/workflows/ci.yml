@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Frontend
+        working-directory: ./frontend
+        run: npm ci
+      - name: Lint Frontend
+        working-directory: ./frontend
+        run: npm run lint
+      - name: Test Frontend
+        working-directory: ./frontend
+        # Using --if-present so the build doesn't fail today before we write our tests tomorrow
+        run: npm run test --if-present
