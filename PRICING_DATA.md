@@ -31,5 +31,5 @@ All pricing logic in the `auditEngine.ts` is backed by the data verified below.
 
 ## Windsurf
 - Pro: $20/user/month — https://windsurf.com/pricing — verified 2026-05-23
-- Pro: $200/user/month — https://windsurf.com/pricing — verified 2026-05-23
+- Enterprise: $200/user/month — https://windsurf.com/pricing — verified 2026-05-23
 - Team: $40/user/month — https://windsurf.com/pricing — verified 2026-05-23

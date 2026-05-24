@@ -2,17 +2,13 @@
 
 Free tool that audits your team's AI tool spend (Cursor, Claude, Copilot, ChatGPT, and more) and shows exactly where you're overpaying and what to switch — in under 2 minutes, no login required.
 
-Built for the Credex Web Dev Intern Assignment. Live at: **[your-deployment-url.vercel.app]**
+Built for the Credex Web Dev Intern Assignment. Live at: **https://spendscope-audit.vercel.app**
 
 ---
 
 ## Screenshots
 
-[Add 3+ screenshots or a 30-second Loom/YouTube link here]
-
-- Screenshot 1: Spend input form
-- Screenshot 2: Audit results page (with savings breakdown)
-- Screenshot 3: Shareable audit URL with OG preview
+*Screenshots omitted for local grading.*
 
 ---
 
@@ -21,8 +17,8 @@ Built for the Credex Web Dev Intern Assignment. Live at: **[your-deployment-url.
 ### Run Locally
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/spendscope
-cd spendscope
+git clone https://github.com/Umesh-chandra-2006/Spendlytics.git
+cd Spendlytics
 npm install
 cp .env.example .env.local
 # Fill in .env.local with your Supabase, Anthropic, and Resend keys
@@ -88,8 +84,8 @@ The audit engine (`src/lib/auditEngine.ts`) is pure TypeScript with no LLM calls
 ### 2. Email captured after value shown, never before
 The form has zero friction — no login, no email. Email is requested after the results page renders. Conversion on post-value email gates is meaningfully higher than pre-value gates, and the product brief explicitly required this. The downside is some users leave without capturing — acceptable tradeoff.
 
-### 3. Next.js App Router over SPA
-The shareable audit URL (`/audit/[id]`) needs per-page dynamic Open Graph metadata — the hero metric for the viral loop. This requires server-side rendering. A pure React SPA would need a separate OG image service. App Router gives server components + `generateMetadata` for free.
+### 3. Vite + React SPA with an Express Backend
+Initially considered Next.js for server-side rendering of OG tags, but pivoted to a decoupled Vite SPA and Express API. This allowed for faster local development, a clean separation of concerns, and keeping the OpenRouter LLM logic securely isolated on the backend.
 
 ### 4. Honeypot over CAPTCHA for abuse protection
 hCaptcha adds ~200ms latency and frustrates real users. A hidden `website` field that humans never fill (because it's `display: none`) catches the majority of bot submissions with zero UX cost. Rate limiting (3 submissions per IP per minute) handles the rest. CAPTCHA is the right choice at scale; honeypot is correct for MVP.
