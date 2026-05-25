@@ -12,36 +12,28 @@ const DEFAULT_FORM: AuditFormData = {
 };
 
 export function usePersistedForm() {
-  const [formData, setFormData] = useState<AuditFormData>(DEFAULT_FORM);
-  const [hydrated, setHydrated] = useState(false);
-
-  // Load from localStorage on mount
-  useEffect(() => {
+  const [formData, setFormData] = useState<AuditFormData>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        setFormData(JSON.parse(saved));
-      }
+      return saved ? JSON.parse(saved) : DEFAULT_FORM;
     } catch {
-      // Corrupt data — start fresh
+      return DEFAULT_FORM;
     }
-    setHydrated(true);
-  }, []);
+  });
 
   // Persist on every change
   useEffect(() => {
-    if (!hydrated) return;
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
     } catch {
       // Storage full or unavailable — silent fail
     }
-  }, [formData, hydrated]);
+  }, [formData]);
 
   function clearForm() {
     localStorage.removeItem(STORAGE_KEY);
     setFormData(DEFAULT_FORM);
   }
 
-  return { formData, setFormData, clearForm, hydrated };
+  return { formData, setFormData, clearForm, hydrated: true };
 }

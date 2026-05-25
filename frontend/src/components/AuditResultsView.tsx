@@ -2,6 +2,17 @@
 // src/components/AuditResultsView.tsx
 import { useState } from 'react';
 import type { AuditResult } from '../types';
+import { 
+  Sparkles, 
+  TrendingDown, 
+  CheckCircle, 
+  Mail, 
+  Share2, 
+  Copy, 
+  CornerDownRight,
+  ChevronRight,
+  TrendingUp
+} from 'lucide-react';
 
 interface Props {
   audit: AuditResult & { id?: string };
@@ -19,11 +30,11 @@ const TOOL_LABELS: Record<string, string> = {
   windsurf: 'Windsurf',
 };
 
-const ACTION_LABELS: Record<string, { label: string; color: string }> = {
-  downgrade: { label: 'Downgrade plan', color: 'bg-amber-100 text-amber-800' },
-  switch: { label: 'Switch tool', color: 'bg-blue-100 text-blue-800' },
-  optimize: { label: 'Optimize usage', color: 'bg-purple-100 text-purple-800' },
-  keep: { label: 'Already optimal', color: 'bg-green-100 text-green-800' },
+const ACTION_LABELS: Record<string, { label: string; color: string; bg: string }> = {
+  downgrade: { label: 'Downgrade plan', color: 'text-amber-300 border-amber-500/20', bg: 'bg-amber-500/10' },
+  switch: { label: 'Switch tool', color: 'text-blue-300 border-blue-500/20', bg: 'bg-blue-500/10' },
+  optimize: { label: 'Optimize usage', color: 'text-purple-300 border-purple-500/20', bg: 'bg-purple-500/10' },
+  keep: { label: 'Already optimal', color: 'text-emerald-300 border-emerald-500/20', bg: 'bg-emerald-500/10' },
 };
 
 export default function AuditResultsView({ audit, isShared = false }: Props) {
@@ -68,81 +79,109 @@ export default function AuditResultsView({ audit, isShared = false }: Props) {
     setTimeout(() => setCopied(false), 2000);
   }
 
+  const hasSavings = audit.totalMonthlySavings > 0;
+
   return (
-    <div className="max-w-2xl mx-auto px-4 py-12">
-      {/* Hero savings */}
-      <div className="text-center mb-10">
-        {audit.totalMonthlySavings > 0 ? (
-          <>
-            <p className="text-sm uppercase tracking-widest text-gray-500 mb-2">
-              Potential savings identified
+    <div className="max-w-4xl mx-auto px-4 py-16">
+      {/* 1. Hero Savings Summary */}
+      <div className="text-center mb-16 relative">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+        
+        {hasSavings ? (
+          <div className="space-y-4">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 mb-2">
+              <TrendingDown className="w-3.5 h-3.5" /> Potential Optimization Found
+            </span>
+            <h1 className="text-5xl sm:text-7xl font-display font-extrabold tracking-tight text-white">
+              $<span className="text-gradient">{audit.totalMonthlySavings.toFixed(0)}</span>
+              <span className="text-xl sm:text-2xl text-gray-400 font-normal">/mo</span>
+            </h1>
+            <p className="text-gray-400 text-sm max-w-sm mx-auto flex items-center justify-center gap-2">
+              <TrendingUp className="w-4 h-4 text-emerald-400" /> Save up to <strong className="text-white">${audit.totalAnnualSavings.toFixed(0)}/year</strong> ({(audit.totalMonthlySavings / (audit.recommendations.reduce((sum, r) => sum + r.currentSpend, 0) || 1) * 100).toFixed(0)}% reduction)
             </p>
-            <p className="text-6xl font-bold tracking-tight">
-              ${audit.totalMonthlySavings.toFixed(0)}
-              <span className="text-2xl text-gray-400 font-normal">/mo</span>
-            </p>
-            <p className="text-gray-500 mt-1">
-              ${audit.totalAnnualSavings.toFixed(0)} annually
-            </p>
-          </>
+          </div>
         ) : (
-          <>
-            <p className="text-4xl font-bold">✓ You're spending well</p>
-            <p className="text-gray-500 mt-2">
-              No significant overspend found in your current stack.
+          <div className="space-y-4">
+            <div className="w-16 h-16 bg-emerald-500/15 text-emerald-300 border border-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-8 h-8" />
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-display font-extrabold text-white">
+              Your AI Spend is Optimal!
+            </h1>
+            <p className="text-gray-400 max-w-sm mx-auto text-sm leading-relaxed">
+              Excellent management. Your active subscriptions align perfectly with your team sizes and use cases.
             </p>
-          </>
+          </div>
         )}
       </div>
 
-      {/* AI summary */}
+      {/* 2. AI Executive Summary Narrative */}
       {audit.aiSummary && (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-8 text-sm text-gray-700 leading-relaxed">
-          {audit.aiSummary}
+        <div className="glass-card rounded-2xl p-6 glow-indigo relative overflow-hidden mb-12 border-indigo-500/10">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-xl" />
+          <h2 className="text-sm uppercase font-bold tracking-wider text-indigo-400 mb-3 flex items-center gap-2">
+            <Sparkles className="w-4 h-4" />
+            AI Executive Summary
+          </h2>
+          <p className="text-gray-300 text-sm leading-relaxed font-medium">
+            {audit.aiSummary}
+          </p>
         </div>
       )}
 
-      {/* Per-tool breakdown */}
-      <div className="space-y-3 mb-10">
-        <h2 className="font-semibold text-sm uppercase tracking-wide text-gray-500">
-          Tool-by-tool breakdown
+      {/* 3. Per-Tool Breakdown Section */}
+      <div className="space-y-4 mb-12">
+        <h2 className="text-xs uppercase font-bold tracking-wider text-gray-500 mb-2">
+          Subscribed Tools & Recommendations
         </h2>
         {audit.recommendations.map((rec, i) => {
-          const action = ACTION_LABELS[rec.action] ?? ACTION_LABELS.keep;
+          const action = ACTION_LABELS[rec.action] || ACTION_LABELS.keep;
+          const isOptimized = rec.monthlySavings > 0;
+
           return (
-            <div key={i} className="border rounded-lg p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-medium text-sm">
-                      {TOOL_LABELS[rec.tool] ?? rec.tool}
+            <div 
+              key={i} 
+              className={`glass-card rounded-2xl p-6 transition-all duration-300 border-white/5 relative overflow-hidden ${
+                isOptimized ? 'hover:border-indigo-500/20' : 'hover:border-white/10'
+              }`}
+            >
+              {/* Tool identity / badge */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2.5">
+                    <span className="font-bold text-white text-base">
+                      {TOOL_LABELS[rec.tool] || rec.tool}
                     </span>
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded-full ${action.color}`}
-                    >
+                    <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border ${action.color} ${action.bg}`}>
                       {action.label}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500">{rec.reason}</p>
-                  {rec.recommendedPlan && (
-                    <p className="text-xs text-gray-400 mt-1">
-                      → Recommended: {rec.recommendedPlan}
-                    </p>
-                  )}
-                  {rec.recommendedTool && (
-                    <p className="text-xs text-gray-400 mt-1">
-                      → Switch to: {rec.recommendedTool}
-                    </p>
+                  <p className="text-xs text-gray-400 leading-relaxed max-w-xl">
+                    {rec.reason}
+                  </p>
+                  
+                  {/* Detailed path indicator */}
+                  {isOptimized && (
+                    <div className="flex items-center gap-2 text-xs text-gray-500 pt-1">
+                      <CornerDownRight className="w-3.5 h-3.5 text-indigo-400" />
+                      <span>Action: Transition {rec.currentPlan.toUpperCase()} &rarr; <strong className="text-indigo-300">{rec.recommendedPlan || rec.recommendedTool}</strong></span>
+                    </div>
                   )}
                 </div>
-                <div className="text-right shrink-0">
-                  <p className="text-xs text-gray-400">
-                    ${rec.currentSpend}/mo now
-                  </p>
-                  {rec.monthlySavings > 0 && (
-                    <p className="text-sm font-semibold text-green-600">
-                      −${rec.monthlySavings.toFixed(0)}/mo
-                    </p>
+
+                {/* Savings numbers */}
+                <div className="flex sm:flex-col items-baseline sm:items-end justify-between sm:justify-start gap-2 shrink-0 border-t sm:border-t-0 border-white/5 pt-4 sm:pt-0">
+                  <div className="text-xs text-gray-500">
+                    Current: ${rec.currentSpend}/mo
+                  </div>
+                  {isOptimized ? (
+                    <div className="text-sm font-bold text-emerald-400 flex items-center gap-1">
+                      Save &minus;${rec.monthlySavings.toFixed(0)}/mo
+                    </div>
+                  ) : (
+                    <div className="text-xs font-semibold text-gray-400">
+                      Optimal
+                    </div>
                   )}
                 </div>
               </div>
@@ -151,102 +190,112 @@ export default function AuditResultsView({ audit, isShared = false }: Props) {
         })}
       </div>
 
-      {/* Credex CTA — only for high savings */}
+      {/* 4. High Savings Enterprise CTA */}
       {audit.savingsTier === 'high' && (
-        <div className="bg-black text-white rounded-xl p-6 mb-8">
-          <p className="font-semibold mb-1">Save more with Credex</p>
-          <p className="text-sm text-gray-300 mb-4">
-            Credex sells discounted AI credits — Cursor, Claude, ChatGPT Enterprise —
-            from companies that overforecast. Book a free consultation and we'll show
-            you exactly how to cut your bill further.
+        <div className="bg-gradient-to-r from-indigo-900/40 via-purple-900/40 to-pink-900/20 border border-indigo-500/20 rounded-2xl p-6 mb-12 relative overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+          <h3 className="font-bold text-lg text-white mb-2">Maximize Savings with Credex</h3>
+          <p className="text-sm text-gray-300 leading-relaxed mb-4 max-w-2xl">
+            Credex manages secondary credits for enterprise tools (Cursor, Claude, OpenAI) from organizations that over-budgeted. Connect with us directly to shave an additional 20-30% off your direct API bills.
           </p>
           <a
             href="https://credex.rocks"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-[#030712] rounded-xl text-xs font-bold hover:bg-gray-100 transition-colors shadow-lg cursor-pointer"
           >
-            Book a free consultation →
+            Get Custom Offer <ChevronRight className="w-4 h-4" />
           </a>
         </div>
       )}
 
-      {/* Lead capture */}
+      {/* 5. Lead Capture Opt-In */}
       {!isShared && !submitted && (
-        <div className="border rounded-xl p-6 mb-8">
-          <h3 className="font-semibold mb-1">
-            {audit.totalMonthlySavings > 0
-              ? 'Get your full report by email'
-              : 'Notify me when new optimizations apply to my stack'}
+        <div className="glass-card rounded-2xl p-6 border-white/5 glow-purple mb-12 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl pointer-events-none" />
+          <h3 className="font-bold text-white text-base mb-1.5 flex items-center gap-2">
+            <Mail className="w-5 h-5 text-purple-400" />
+            {hasSavings 
+              ? 'Send the PDF report to your inbox' 
+              : 'Keep me posted on better rates'}
           </h3>
-          <p className="text-sm text-gray-500 mb-4">
-            We'll send you a summary and follow up if better options emerge.
+          <p className="text-xs text-gray-500 mb-6 leading-relaxed">
+            Get the full itemized analysis to share with your finance team, and we'll alert you if rates fluctuate.
           </p>
 
-          {/* Honeypot — hidden from humans */}
+          {/* Honeypot field (anti-spam) */}
           <input
             type="text"
             value={honeypot}
             onChange={(e) => setHoneypot(e.target.value)}
-            style={{ display: 'none' }}
+            className="hidden"
             aria-hidden="true"
             tabIndex={-1}
             autoComplete="off"
             name="website"
           />
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             <input
               type="email"
-              placeholder="Work email"
+              placeholder="Enter work email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 text-sm"
+              className="w-full bg-gray-950/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-gray-600"
               required
             />
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <input
                 type="text"
-                placeholder="Company (optional)"
+                placeholder="Company Name (optional)"
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
-                className="w-full border rounded-lg px-3 py-2 text-sm"
+                className="w-full bg-gray-950/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-gray-600"
               />
               <input
                 type="text"
-                placeholder="Role (optional)"
+                placeholder="Role / Title (optional)"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="w-full border rounded-lg px-3 py-2 text-sm"
+                className="w-full bg-gray-950/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-gray-600"
               />
             </div>
             <button
               onClick={handleLeadCapture}
               disabled={submitting || !email.includes('@')}
-              className="w-full bg-black text-white py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800 disabled:opacity-50 transition-colors"
+              className="w-full py-3 px-4 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-xl text-sm font-bold tracking-wide transition-all shadow-lg shadow-purple-500/10 cursor-pointer disabled:opacity-40"
             >
-              {submitting ? 'Sending…' : 'Send my report'}
+              {submitting ? 'Sending Report…' : 'Send Report & Insights'}
             </button>
           </div>
         </div>
       )}
 
       {submitted && (
-        <div className="border border-green-200 bg-green-50 rounded-xl p-4 mb-8 text-sm text-green-800">
-          ✓ Report sent to {email}. We'll be in touch if your stack qualifies for
-          further savings.
+        <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-300 text-sm flex items-center gap-2 mb-12">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0 animate-ping" />
+          Report sent successfully to <strong>{email}</strong>! Check your inbox shortly.
         </div>
       )}
 
-      {/* Share URL */}
+      {/* 6. Share Audit Link */}
       {audit.id && (
-        <div className="flex items-center gap-2 border rounded-lg px-3 py-2">
-          <span className="text-xs text-gray-400 flex-1 truncate">{shareUrl}</span>
+        <div className="glass-card rounded-xl p-4 flex items-center justify-between gap-4 border-white/5">
+          <div className="flex items-center gap-2 min-w-0">
+            <Share2 className="w-4 h-4 text-gray-500 shrink-0" />
+            <span className="text-xs text-gray-400 truncate select-all">{shareUrl}</span>
+          </div>
           <button
             onClick={copyShareLink}
-            className="text-xs font-medium text-black shrink-0 hover:underline"
+            className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-white border border-white/5 cursor-pointer shrink-0 transition-all active:scale-95"
           >
-            {copied ? 'Copied!' : 'Copy link'}
+            {copied ? (
+              <>Copied!</>
+            ) : (
+              <>
+                <Copy className="w-3.5 h-3.5" /> Copy Link
+              </>
+            )}
           </button>
         </div>
       )}
