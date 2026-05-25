@@ -1,15 +1,47 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, useParams, Link } from 'react-router-dom';
 import SpendForm from './components/SpendForm';
+import AuditResultsView from './components/AuditResultsView';
+import { runAudit } from './lib/auditEngine';
+import { usePersistedForm } from './lib/usePersistedForm';
 import './App.css';
 
 function AuditResultRoute() {
-  // In a complete implementation, this would fetch the audit result by ID from the backend
-  // Since we are mocking the backend persistence, we just show a placeholder here.
+  const { id } = useParams();
+  const location = useLocation();
+  const stateResult = location.state?.result;
+  const { formData } = usePersistedForm();
+
+  // If we have it in router state, use it
+  let audit = stateResult;
+
+  // If not, compute it locally on the fly
+  if (!audit) {
+    const result = runAudit(formData);
+    const topSaver = [...result.recommendations].sort((a, b) => b.monthlySavings - a.monthlySavings)[0];
+    const aiSummary = result.savingsTier === 'optimal'
+      ? `Your team of ${formData.teamSize} is running a lean AI stack for ${formData.useCase} work — no significant overspend detected. Your current tool choices are well-matched to your team size and use case.`
+      : `Your team of ${formData.teamSize} is spending more than necessary on AI tools for ${formData.useCase} work. The biggest opportunity is ${topSaver?.tool ? topSaver.tool.toUpperCase() : 'your current stack'} — switching to the recommended plan saves $${result.totalMonthlySavings.toFixed(0)}/month.`;
+    
+    audit = {
+      ...result,
+      id,
+      aiSummary
+    };
+  } else {
+    audit = {
+      ...audit,
+      id
+    };
+  }
+
   return (
-    <div className="p-12 text-center text-gray-500">
-      <h2 className="text-2xl font-bold text-black mb-4">Audit Saved</h2>
-      <p>Your audit has been successfully generated.</p>
-      <p className="mt-2 text-sm">(Full persistence and fetching by ID can be connected to Supabase here)</p>
+    <div className="min-h-screen bg-[#f9fafb]">
+      <div className="max-w-2xl mx-auto pt-6 px-4">
+        <Link to="/" className="text-sm font-medium text-gray-500 hover:text-black transition-colors">
+          ← Back to form
+        </Link>
+      </div>
+      <AuditResultsView audit={audit} />
     </div>
   );
 }

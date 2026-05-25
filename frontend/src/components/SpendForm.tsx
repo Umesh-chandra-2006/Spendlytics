@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { usePersistedForm } from '../lib/usePersistedForm';
 import type { ToolName, ToolEntry, UseCase } from '../types';
 import { useNavigate } from 'react-router-dom';
+import { runAudit } from '../lib/auditEngine';
 
 const TOOLS: { name: ToolName; label: string; plans: string[] }[] = [
   {
@@ -120,15 +121,28 @@ export default function SpendForm() {
       });
 
       if (!res.ok) throw new Error('Audit failed');
-      const { id } = await res.json();
+      const { id, result } = await res.json();
 
       if (id) {
-        navigate(`/audit/${id}`);
+        navigate(`/audit/${id}`, { state: { result } });
       } else {
         setError('Could not save audit. Please try again.');
       }
-    } catch {
-      setError('Something went wrong. Please try again.');
+    } catch (err) {
+      console.warn('Backend API call failed, running locally:', err);
+      // Run audit locally
+      try {
+        const result = runAudit(formData);
+        const topSaver = [...result.recommendations].sort((a, b) => b.monthlySavings - a.monthlySavings)[0];
+        const aiSummary = result.savingsTier === 'optimal'
+          ? `Your team of ${formData.teamSize} is running a lean AI stack for ${formData.useCase} work — no significant overspend detected. Your current tool choices are well-matched to your team size and use case.`
+          : `Your team of ${formData.teamSize} is spending more than necessary on AI tools for ${formData.useCase} work. The biggest opportunity is ${topSaver?.tool ? topSaver.tool.toUpperCase() : 'your current stack'} — switching to the recommended plan saves $${result.totalMonthlySavings.toFixed(0)}/month.`;
+        
+        navigate(`/audit/local`, { state: { result: { ...result, aiSummary } } });
+      } catch (localErr) {
+        console.error('Local audit failed:', localErr);
+        setError('Something went wrong. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
