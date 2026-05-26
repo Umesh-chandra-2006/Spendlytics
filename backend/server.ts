@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { runAudit } from './src/auditEngine';
 import { generateSummary } from './src/generateSummary';
 import { AuditFormData } from './src/types';
+import { saveAudit, getAudit, saveLead } from './src/db';
 
 dotenv.config();
 
@@ -25,8 +26,8 @@ app.post('/api/audit', async (req, res) => {
     const aiSummary = await generateSummary(body, result);
     result.aiSummary = aiSummary;
 
-    // TODO: Implement actual Supabase insert if needed. For now we generate a UUID so the frontend can redirect.
     const id = uuidv4();
+    await saveAudit(id, result, body);
 
     res.json({ result, id });
   } catch (error) {
@@ -35,8 +36,23 @@ app.post('/api/audit', async (req, res) => {
   }
 });
 
+app.get('/api/audit/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const audit = await getAudit(id);
+    if (!audit) {
+      return res.status(404).json({ error: 'Audit not found' });
+    }
+    res.json({ result: audit });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.post('/api/leads', async (req, res) => {
   try {
+    await saveLead(req.body);
     res.json({ success: true });
   } catch (error) {
     console.error(error);
