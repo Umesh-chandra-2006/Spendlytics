@@ -44,7 +44,15 @@ function AuditResultRoute() {
     const fetchAudit = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API_BASE}/api/audit/${id}`);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+        const res = await fetch(`${API_BASE}/api/audit/${id}`, {
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+
         if (!res.ok) {
           throw new Error('Audit not found on server');
         }

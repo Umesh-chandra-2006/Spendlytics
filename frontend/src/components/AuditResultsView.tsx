@@ -56,6 +56,9 @@ export default function AuditResultsView({ audit, isShared = false }: Props) {
     if (!email.includes('@')) return;
     setSubmitting(true);
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+
       await fetch(`${API_BASE}/api/leads`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -67,7 +70,13 @@ export default function AuditResultsView({ audit, isShared = false }: Props) {
           auditId: audit.id,
           monthlySavings: audit.totalMonthlySavings,
         }),
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
+      setSubmitted(true);
+    } catch (err) {
+      console.warn('Lead capture API failed or timed out:', err);
+      // Fallback: mark as submitted for positive UX
       setSubmitted(true);
     } finally {
       setSubmitting(false);
