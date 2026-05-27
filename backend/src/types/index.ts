@@ -74,5 +74,5 @@ export interface LeadCaptureData {
   role?: string;
   teamSize?: number;
   // honeypot
-  website?: string; // must be empty — bots fill this
+  website?: string; // must be empty - bots fill this
 }

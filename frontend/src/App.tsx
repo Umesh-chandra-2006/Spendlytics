@@ -5,6 +5,8 @@ import AuditResultsView from './components/AuditResultsView';
 import { runAudit } from './lib/auditEngine';
 import { usePersistedForm } from './lib/usePersistedForm';
 import { Loader2 } from 'lucide-react';
+import type { AuditResult } from './types';
+import { API_BASE } from './config';
 import './App.css';
 
 function AuditResultRoute() {
@@ -13,49 +15,49 @@ function AuditResultRoute() {
   const stateResult = location.state?.result;
   const { formData } = usePersistedForm();
 
-  const [audit, setAudit] = useState<any>(stateResult || null);
-  const [loading, setLoading] = useState(!stateResult);
-  const [fetchError, setFetchError] = useState<string | null>(null);
-
-  useEffect(() => {
-    // If we already have the result from navigation, no need to fetch
+  const [audit, setAudit] = useState<AuditResult | null>(() => {
     if (stateResult) {
-      setAudit({ ...stateResult, id });
-      setLoading(false);
-      return;
+      return { ...stateResult, id };
     }
-
     if (!id || id === 'local') {
-      // Offline/local calculation fallback
       const result = runAudit(formData);
       const topSaver = [...result.recommendations].sort((a, b) => b.monthlySavings - a.monthlySavings)[0];
       const aiSummary = result.savingsTier === 'optimal'
-        ? `Your team of ${formData.teamSize} is running a lean AI stack for ${formData.useCase} work — no significant overspend detected. Your current tool choices are well-matched to your team size and use case.`
-        : `Your team of ${formData.teamSize} is spending more than necessary on AI tools for ${formData.useCase} work. The biggest opportunity is ${topSaver?.tool ? topSaver.tool.toUpperCase() : 'your current stack'} — switching to the recommended plan saves $${result.totalMonthlySavings.toFixed(0)}/month.`;
+        ? `Your team of ${formData.teamSize} is running a lean AI stack for ${formData.useCase} work - no significant overspend detected. Your current tool choices are well-matched to your team size and use case.`
+        : `Your team of ${formData.teamSize} is spending more than necessary on AI tools for ${formData.useCase} work. The biggest opportunity is ${topSaver?.tool ? topSaver.tool.toUpperCase() : 'your current stack'} - switching to the recommended plan saves $${result.totalMonthlySavings.toFixed(0)}/month.`;
       
-      setAudit({ ...result, id, aiSummary });
-      setLoading(false);
-      return;
+      return { ...result, id, aiSummary };
     }
+    return null;
+  });
+  
+  const [loading, setLoading] = useState(() => {
+    return !!(id && id !== 'local' && !stateResult);
+  });
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Only fetch if we need to
+    if (stateResult || !id || id === 'local') return;
 
     // Fetch from backend API
     const fetchAudit = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`http://localhost:3001/api/audit/${id}`);
+        const res = await fetch(`${API_BASE}/api/audit/${id}`);
         if (!res.ok) {
           throw new Error('Audit not found on server');
         }
         const data = await res.json();
         setAudit({ ...data.result, id });
-      } catch (err: any) {
+      } catch (err) {
         console.warn('Backend fetch failed, falling back to local calculation:', err);
         // Fallback calculation on fetch error
         const result = runAudit(formData);
         const topSaver = [...result.recommendations].sort((a, b) => b.monthlySavings - a.monthlySavings)[0];
         const aiSummary = result.savingsTier === 'optimal'
-          ? `Your team of ${formData.teamSize} is running a lean AI stack for ${formData.useCase} work — no significant overspend detected. Your current tool choices are well-matched to your team size and use case.`
-          : `Your team of ${formData.teamSize} is spending more than necessary on AI tools for ${formData.useCase} work. The biggest opportunity is ${topSaver?.tool ? topSaver.tool.toUpperCase() : 'your current stack'} — switching to the recommended plan saves $${result.totalMonthlySavings.toFixed(0)}/month.`;
+          ? `Your team of ${formData.teamSize} is running a lean AI stack for ${formData.useCase} work - no significant overspend detected. Your current tool choices are well-matched to your team size and use case.`
+          : `Your team of ${formData.teamSize} is spending more than necessary on AI tools for ${formData.useCase} work. The biggest opportunity is ${topSaver?.tool ? topSaver.tool.toUpperCase() : 'your current stack'} - switching to the recommended plan saves $${result.totalMonthlySavings.toFixed(0)}/month.`;
         
         setAudit({ ...result, id, aiSummary });
         setFetchError('Offline Mode: Loaded client-side fallback.');

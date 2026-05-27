@@ -1,4 +1,4 @@
-# Architecture Decisions & Rationale
+# Architecture Decisions - Rationale
 
 **1-Sentence Summary**: SpendScope is a deterministic, client-heavy React application with a lightweight Express backend that proxies LLM requests, persisting nothing until the user opts in.
 

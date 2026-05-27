@@ -10,7 +10,7 @@ import type {
 } from '../types';
 
 // ---------------------------------------------------------------------------
-// Pricing constants — every number must match PRICING_DATA.md
+// Pricing constants - every number must match PRICING_DATA.md
 // Last verified: 2026-05-22
 // ---------------------------------------------------------------------------
 const PRICING = {
@@ -80,7 +80,7 @@ function auditCursor(entry: ToolEntry): ToolRecommendation {
       projectedSpend: projected,
       monthlySavings: entry.monthlySpend - projected,
       annualSavings: (entry.monthlySpend - projected) * 12,
-      reason: `Cursor Business adds admin controls and SSO — unnecessary for ${entry.seats} users; Pro at $20/seat saves $${(entry.monthlySpend - projected).toFixed(0)}/mo with identical coding capability.`,
+      reason: `Cursor Business adds admin controls and SSO - unnecessary for ${entry.seats} users; Pro at $20/seat saves $${(entry.monthlySpend - projected).toFixed(0)}/mo with identical coding capability.`,
     };
   }
 
@@ -119,7 +119,7 @@ function auditCopilot(entry: ToolEntry, useCase: string): ToolRecommendation {
       projectedSpend: projected,
       monthlySavings: entry.monthlySpend - projected,
       annualSavings: (entry.monthlySpend - projected) * 12,
-      reason: `Copilot Business adds policy management and audit logs — overkill for ${entry.seats} devs; Individual at $10/seat is identical for day-to-day coding.`,
+      reason: `Copilot Business adds policy management and audit logs - overkill for ${entry.seats} devs; Individual at $10/seat is identical for day-to-day coding.`,
     };
   }
 
@@ -144,7 +144,7 @@ function auditCopilot(entry: ToolEntry, useCase: string): ToolRecommendation {
       monthlySavings: 0,
       annualSavings: 0,
       reason:
-        'If your team already uses Cursor, Copilot provides redundant completions — audit whether both are actively used.',
+        'If your team already uses Cursor, Copilot provides redundant completions - audit whether both are actively used.',
     };
   }
 
@@ -175,7 +175,7 @@ function auditClaude(entry: ToolEntry): ToolRecommendation {
   }
 
   if (entry.plan === 'team' && entry.seats < 5) {
-    // Team min is 5 — if they report fewer seats, they're paying for unused seats
+    // Team min is 5 - if they report fewer seats, they're paying for unused seats
     const projected = PRICING.claude.pro * entry.seats;
     return {
       ...base,
@@ -184,7 +184,7 @@ function auditClaude(entry: ToolEntry): ToolRecommendation {
       projectedSpend: projected,
       monthlySavings: entry.monthlySpend - projected,
       annualSavings: (entry.monthlySpend - projected) * 12,
-      reason: `Claude Team has a 5-seat minimum at $25/seat; with ${entry.seats} active users you're paying for unused seats — individual Pro plans save $${(entry.monthlySpend - projected).toFixed(0)}/mo.`,
+      reason: `Claude Team has a 5-seat minimum at $25/seat; with ${entry.seats} active users you're paying for unused seats - individual Pro plans save $${(entry.monthlySpend - projected).toFixed(0)}/mo.`,
     };
   }
 
@@ -210,7 +210,7 @@ function auditChatGPT(entry: ToolEntry): ToolRecommendation {
       projectedSpend: projected,
       monthlySavings: entry.monthlySpend - projected,
       annualSavings: (entry.monthlySpend - projected) * 12,
-      reason: `ChatGPT Team adds workspace and collaboration features — for 2 users, two Plus plans cost $40/mo vs $40/mo Team, same model access.`,
+      reason: `ChatGPT Team adds workspace and collaboration features - for 2 users, two Plus plans cost $40/mo vs $40/mo Team, same model access.`,
     };
   }
 
@@ -242,7 +242,7 @@ function auditGemini(entry: ToolEntry, useCase: string): ToolRecommendation {
         projectedSpend: projected,
         monthlySavings: entry.monthlySpend - projected,
         annualSavings: (entry.monthlySpend - projected) * 12,
-        reason: `For writing/research, Claude Pro benchmarks higher on long-form tasks and costs the same — worth trialing if your team isn't embedded in Google Workspace.`,
+        reason: `For writing/research, Claude Pro benchmarks higher on long-form tasks and costs the same - worth trialing if your team isn't embedded in Google Workspace.`,
       };
     }
   }
@@ -269,7 +269,7 @@ function auditWindsurf(entry: ToolEntry): ToolRecommendation {
       projectedSpend: projected,
       monthlySavings: entry.monthlySpend - projected,
       annualSavings: (entry.monthlySpend - projected) * 12,
-      reason: `Windsurf Team adds admin and billing consolidation — for ${entry.seats} devs, individual Pro plans at $20/seat save $${(entry.monthlySpend - projected).toFixed(0)}/mo.`,
+      reason: `Windsurf Team adds admin and billing consolidation - for ${entry.seats} devs, individual Pro plans at $20/seat save $${(entry.monthlySpend - projected).toFixed(0)}/mo.`,
     };
   }
 
@@ -288,7 +288,7 @@ function auditAPISpend(entry: ToolEntry): ToolRecommendation {
     monthlySavings: isHigh ? entry.monthlySpend * 0.3 : 0,
     annualSavings: isHigh ? entry.monthlySpend * 0.3 * 12 : 0,
     reason: isHigh
-      ? `At $${entry.monthlySpend}/mo, implement prompt caching and model routing (use cheaper models for simpler tasks) — industry benchmarks suggest 20–40% reduction is achievable.`
+      ? `At $${entry.monthlySpend}/mo, implement prompt caching and model routing (use cheaper models for simpler tasks) - industry benchmarks suggest 20-40% reduction is achievable.`
       : `API spend of $${entry.monthlySpend}/mo is within normal range; monitor monthly for growth.`,
   };
 }

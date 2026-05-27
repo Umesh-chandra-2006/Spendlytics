@@ -1,7 +1,7 @@
 # Go-To-Market Strategy (GTM)
 
 ## 1. Target Audience
-Our initial wedge is **small-to-medium development teams (3–20 seats)** and **freelance solo builders**. 
+Our initial wedge is **small-to-medium development teams (3-20 seats)** and **freelance solo builders**. 
 Based on our user interviews, this demographic actively overlaps subscriptions (e.g., Cursor + GitHub Copilot, or Claude Pro + ChatGPT Plus) as an "insurance policy" against rate limits. They have the autonomy to change their tooling stack instantly without enterprise procurement processes.
 
 ## 2. The Hook

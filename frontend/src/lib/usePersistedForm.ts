@@ -26,7 +26,7 @@ export function usePersistedForm() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
     } catch {
-      // Storage full or unavailable — silent fail
+      // Storage full or unavailable - silent fail
     }
   }, [formData]);
 

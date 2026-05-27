@@ -2,6 +2,7 @@
 // src/components/AuditResultsView.tsx
 import { useState } from 'react';
 import type { AuditResult } from '../types';
+import { API_BASE } from '../config';
 import { 
   Sparkles, 
   TrendingDown, 
@@ -55,7 +56,7 @@ export default function AuditResultsView({ audit, isShared = false }: Props) {
     if (!email.includes('@')) return;
     setSubmitting(true);
     try {
-      await fetch('http://localhost:3001/api/leads', {
+      await fetch(`${API_BASE}/api/leads`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
