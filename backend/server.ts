@@ -6,6 +6,7 @@ import { runAudit } from './src/auditEngine';
 import { generateSummary } from './src/generateSummary';
 import { AuditFormData } from './src/types';
 import { saveAudit, getAudit, saveLead } from './src/db';
+import { sendConfirmationEmail } from './src/email';
 
 dotenv.config();
 
@@ -53,6 +54,8 @@ app.get('/api/audit/:id', async (req, res) => {
 app.post('/api/leads', async (req, res) => {
   try {
     await saveLead(req.body);
+    // Send transactional confirmation email asynchronously
+    sendConfirmationEmail(req.body.email, req.body.monthlySavings || 0);
     res.json({ success: true });
   } catch (error) {
     console.error(error);

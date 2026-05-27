@@ -100,7 +100,7 @@ function auditCursor(entry: ToolEntry): ToolRecommendation {
   return { ...base, monthlySavings: 0, annualSavings: 0 };
 }
 
-function auditCopilot(entry: ToolEntry, useCase: string): ToolRecommendation {
+function auditCopilot(entry: ToolEntry, useCase: string, hasCursor: boolean): ToolRecommendation {
   const base: Omit<ToolRecommendation, 'monthlySavings' | 'annualSavings'> = {
     tool: 'github_copilot',
     currentPlan: entry.plan,
@@ -136,8 +136,8 @@ function auditCopilot(entry: ToolEntry, useCase: string): ToolRecommendation {
     };
   }
 
-  // Cross-tool: if on copilot for coding and team also has Cursor, flag overlap
-  if (useCase === 'coding') {
+  // Cross-tool: if on copilot for coding or if Cursor is present, flag overlap
+  if (useCase === 'coding' || hasCursor) {
     return {
       ...base,
       action: 'keep',
@@ -304,7 +304,7 @@ export function runAudit(formData: AuditFormData): AuditResult {
       case 'cursor':
         return auditCursor(entry);
       case 'github_copilot':
-        return auditCopilot(entry, formData.useCase);
+        return auditCopilot(entry, formData.useCase, tools.some((t) => t.tool === 'cursor'));
       case 'claude':
         return auditClaude(entry);
       case 'chatgpt':
